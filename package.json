@@ -1,0 +1,15 @@
+{
+  "name": "logsearch",
+  "version": "1.0.0",
+  "description": "Log search API implemented for Cribl",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "logsearch-cribl"
+  },
+  "author": "Mark West",
+  "license": "ISC"
+}
