@@ -1,0 +1,11 @@
+
+# Dependency directories
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+.npm
+
+# SampleData too large
+SampleData/
