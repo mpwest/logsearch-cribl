@@ -4,6 +4,11 @@ import Logger from '../logger/Logger'
 import FileDoesNotExist from '../error/FileDoesNotExist'
 
 class LogSearch {
+    logger: Logger
+
+    constructor(logger: Logger) {
+        this.logger = logger
+    }
     getPath(): string {
         var configPath = process.env.LogPath
         if (configPath !== undefined) {
@@ -21,34 +26,54 @@ class LogSearch {
         }
     }
 
-    async getLogs (filename: string, recordCount: number, searchTerms: string[], searchAny: boolean): Promise<string[]> {
+    async getLogs (filename: string, recordCount: number, searchTerms: string[], searchAny: boolean, matchCase: boolean): Promise<string[]> {
         let fileHandle
         try {
             let filePath = await this.findFile(filename)
-            Logger.trace(`Found file ${filePath}`)
-            fileHandle = await fs.open(filePath)
             const fileSize = (await fs.stat(filePath)).size
+            this.logger.trace(`fileSize: ${fileSize}`)
 
-            const batchSize = parseInt(process.env.BatchSize?.toString() ?? '') || 20000
-            let offset = Math.max(0, fileSize - batchSize)
+            fileHandle = await fs.open(filePath)
+            let batchSize = Math.min(parseInt(process.env.BatchSize?.toString() ?? '20000'), fileSize)
+            let readStart = fileSize - batchSize
+            let blockStart = '' // end of an incomplete line read in. Ignore during first iteration, append to what's read subsequently
 
             let entries: string[] = []
-            let blockStart = ''
+
             while (entries.length < recordCount)
             {
-                let batch = await fileHandle.read(Buffer.alloc(batchSize), offset, batchSize) + blockStart
+                this.logger.trace(`Batch size: ${batchSize}, start at: ${readStart}, recordCount: ${recordCount}, found: ${entries.length}`)
+                const readResult = await fileHandle.read(Buffer.alloc(batchSize), 0, batchSize, readStart)
+                const batch = readResult.buffer.toString() + blockStart
+
                 const lines = batch.split(/[\r\n]+/)
                 blockStart = lines[0]
+                this.logger.trace(`blockStart: ${blockStart}`)
 
-                lines.shift()
-                lines.forEach((line) => {
-                    if(this.filter(line, searchTerms, searchAny)) {
-                        entries.push(line)
+                // ignore first line, assuming it's a partial line, unless line spans multiple chunks, or beginning of file reached
+                if (readStart > 0 && lines.length > 1) {
+                    lines.shift()
+                }
+                for(let i = lines.length - 1; i >=0; i--) {
+                    // May wish to filter out whitespace, but seems not worth the processing, given the record source rarely includes non-empty whitespace lines
+                    if(entries.length < recordCount && lines[i].length > 0 && this.filter(lines[i], searchTerms, searchAny, matchCase)) {
+                        this.logger.debug(`Found line: ${lines[i]}`)
+                        entries.push(lines[i])
                     }
-                })
+                }
 
-                if (offset === 0) break
-                offset = Math.min(0, offset - batchSize)
+                if (readStart === 0)
+                {
+                    this.logger.trace('reached beginning of file')
+                    break
+                }
+                if (readStart < batchSize)
+                {
+                    batchSize = readStart
+                    readStart = 0
+                } else {
+                    readStart -= batchSize
+                }
             }
             return entries
         }
@@ -59,37 +84,43 @@ class LogSearch {
             }
         }
     }
-    private async findFile(filename: string): Promise<string> {
+    async findFile(filename: string): Promise<string> {
         const folder = this.getPath()
         const files = await fs.readdir(folder)
-        Logger.trace(`findFile input: ${filename}`)
+        this.logger.trace(`findFile input: ${filename}`)
 
         let fileName = ''
         files.forEach((file) => {
-            Logger.trace(`Check if ${file} matches input (${path.parse(file).name} or ${path.basename(file)})`)
+            this.logger.trace(`Check if ${file} matches input (${path.parse(file).name} or ${path.basename(file)})`)
             if(path.parse(file).name === filename || path.basename(file) === filename) {
                 fileName = file
             }
         })
-        if (fileName) {
-            return fileName
+        if (fileName != '') {
+            return path.join(folder, fileName)
         }
         throw new FileDoesNotExist()
     }
 
-    private filter(line: string, searchTerms: string[], searchAny: boolean): boolean {
-        if (!searchTerms) {
+    filter(line: string, searchTerms: string[], searchAny: boolean, matchCase: boolean): boolean {
+        if (!searchTerms || searchTerms.length == 0) {
+            this.logger.trace('No search terms')
             return true
         }
-        searchTerms.forEach((keyword) => {
-            if(!line.search(keyword)) {
-                if(!searchAny)
-                return false
+        const lineSearch = matchCase ? line : line.toLowerCase()
+        this.logger.trace(searchTerms.toString())
+        for (let i = 0; i < searchTerms.length; i++){
+            let found = lineSearch.search(matchCase ? searchTerms[i] :searchTerms[i].toLowerCase())
+            this.logger.trace(`Searching ${searchTerms[i]} in ${line}: ${found} (SearchAny: ${searchAny})`)
+            if(found == -1) {
+                if(!searchAny) {
+                    return false
+                }
             }
             else if (searchAny) {
                 return true
             }
-        })
+        }
         return !searchAny
     }
 }

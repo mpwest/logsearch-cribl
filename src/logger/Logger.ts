@@ -1,40 +1,55 @@
+import fs from 'fs/promises'
+import { EOL } from 'os'
+
 class Logger
 {
-    static defaultLogLevel = 0
+    location: string
+    logLevel: number
+    defaultLogLevel = 0
 
-    static error(message: string) {
+    constructor(){
+        this.location = process.env.Output ?? ''
+        this.logLevel = this.getLogLevel()
+    }
+
+    error(message: string) {
         this.log(message)
     }
 
-    static warn(message: string) {
-        if (this.getLogLevel() <= LogLevel.warning) {
+    warn(message: string) {
+        if (this.logLevel <= LogLevel.warning) {
             this.log(message)
         }
     }
 
-    static info(message: string) {
-        if (this.getLogLevel() <= LogLevel.info) {
+    info(message: string) {
+        if (this.logLevel <= LogLevel.info) {
             this.log(message)
         }
     } 
 
-    static debug(message: string) {
-        if (this.getLogLevel() <= LogLevel.debug) {
+    debug(message: string) {
+        if (this.logLevel <= LogLevel.debug) {
             this.log(message)
         }
     }
     
-    static trace(message: string) {
-        if (this.getLogLevel() <= LogLevel.trace) {
+    trace(message: string) {
+        if (this.logLevel <= LogLevel.trace) {
             this.log(message)
         }
     } 
 
-    static log(message: string) {
-        console.log(message)
+    log(message: string) {
+        if(this.location == '') {
+            console.log(message)
+        } else {
+            message = message.concat(EOL)
+            fs.appendFile(this.location, message)
+        }
     }
 
-    static getLogLevel(): number {
+    getLogLevel(): number {
         return parseInt(process.env.LogLevel || '') ?? this.defaultLogLevel
     }
 }

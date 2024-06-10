@@ -11,3 +11,6 @@ node_modules/
 SampleData/
 
 dist/
+
+package-lock.json
+output.log
