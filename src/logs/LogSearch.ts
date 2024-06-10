@@ -1,14 +1,35 @@
-import SearchCriteria from '../util/SearchCriteria'
 import fs from 'fs/promises'
+import path from 'path'
+import Logger from '../logger/Logger'
+import FileDoesNotExist from '../error/FileDoesNotExist'
 
 class LogSearch {
+    getPath(): string {
+        var configPath = process.env.LogPath
+        if (configPath !== undefined) {
+            return configPath
+        }
+
+        const platform = process.platform
+        
+        switch(platform) {
+            case 'win32':
+                return 'C:\\WINDOWS\\system32\\config\\'
+            // Other platforms as needed
+            default:
+                return '/var/log'
+        }
+    }
+
     async getLogs (filename: string, recordCount: number, searchTerms: string[], searchAny: boolean): Promise<string[]> {
         let fileHandle
         try {
-            fileHandle = await fs.open(filename)
-            const fileSize = (await fs.stat(filename)).size
+            let filePath = await this.findFile(filename)
+            Logger.trace(`Found file ${filePath}`)
+            fileHandle = await fs.open(filePath)
+            const fileSize = (await fs.stat(filePath)).size
 
-            const batchSize = parseInt(process.env.batchSize?.toString() ?? '') || 20000
+            const batchSize = parseInt(process.env.BatchSize?.toString() ?? '') || 20000
             let offset = Math.max(0, fileSize - batchSize)
 
             let entries: string[] = []
@@ -37,6 +58,23 @@ class LogSearch {
                 await fileHandle.close()
             }
         }
+    }
+    private async findFile(filename: string): Promise<string> {
+        const folder = this.getPath()
+        const files = await fs.readdir(folder)
+        Logger.trace(`findFile input: ${filename}`)
+
+        let fileName = ''
+        files.forEach((file) => {
+            Logger.trace(`Check if ${file} matches input (${path.parse(file).name} or ${path.basename(file)})`)
+            if(path.parse(file).name === filename || path.basename(file) === filename) {
+                fileName = file
+            }
+        })
+        if (fileName) {
+            return fileName
+        }
+        throw new FileDoesNotExist()
     }
 
     private filter(line: string, searchTerms: string[], searchAny: boolean): boolean {

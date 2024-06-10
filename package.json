@@ -4,7 +4,9 @@
   "description": "Log search API implemented for Cribl",
   "main": "src/index.ts",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
   },
   "repository": {
     "type": "git",
