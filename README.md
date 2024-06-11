@@ -8,7 +8,7 @@ Instructions
         LogPath = var\log
         Output = (default not present, write to console; set to output location to write application logs to file)
     Run: npm run start (= 'node --env-file=.env dist/index.js')
-
+    
     GET /logs/:filename
         where filename can include file extension or not
         Query params:
