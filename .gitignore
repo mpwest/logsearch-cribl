@@ -9,6 +9,7 @@ node_modules/
 
 # SampleData too large
 SampleData/
+LogSearch.zip
 
 dist/
 

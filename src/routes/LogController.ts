@@ -34,12 +34,16 @@ logRoutes.get('/logs/:filename', async function(req: express.Request, res: expre
 
     logger.info(`log request for ${filename} (${recordCount} records${searchTerms.length > 0 ? `, search terms: ${searchTerms}${searchAny ? ' (Any)' : ' (All)'}`: ''})`)
     try {
+        logger.trace('pre log search')
         let response = await new LogSearch(logger).getLogs(filename!, recordCount, searchTerms, searchAny, matchCase)
         res.send(response)
     }
     catch (err: unknown){
-        if (typeof err === typeof FileDoesNotExist) {
+        if (err instanceof FileDoesNotExist) {
             res.status(400).send()
+        } else {
+            // other error handling here as needed
+            res.status(500).send()
         }
     }
 })

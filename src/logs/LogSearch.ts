@@ -27,9 +27,15 @@ class LogSearch {
     }
 
     async getLogs (filename: string, recordCount: number, searchTerms: string[], searchAny: boolean, matchCase: boolean): Promise<string[]> {
+        this.logger.trace('getLogs')
         let fileHandle
         try {
             let filePath = await this.findFile(filename)
+            if (filePath == '') {
+                this.logger.trace('file does not exist')
+                throw new FileDoesNotExist()
+            }
+            this.logger.trace(`Filepath: ${filePath}`)
             const fileSize = (await fs.stat(filePath)).size
             this.logger.trace(`fileSize: ${fileSize}`)
 
@@ -84,8 +90,10 @@ class LogSearch {
             }
         }
     }
+
     async findFile(filename: string): Promise<string> {
         const folder = this.getPath()
+        this.logger.trace(folder)
         const files = await fs.readdir(folder)
         this.logger.trace(`findFile input: ${filename}`)
 
@@ -99,7 +107,9 @@ class LogSearch {
         if (fileName != '') {
             return path.join(folder, fileName)
         }
-        throw new FileDoesNotExist()
+        this.logger.trace(`${filename} not found`)
+        // Returning empty string allows using this function in other scenarios where it may not require the file to exist, without handling errors as part of program flow
+        return ''
     }
 
     filter(line: string, searchTerms: string[], searchAny: boolean, matchCase: boolean): boolean {

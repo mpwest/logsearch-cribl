@@ -10,6 +10,7 @@ describe('log search', async () => {
     let folder: string
 
     const filename = 'syslog_short.log'
+    const badFilename = 'gibberishNonexistentFilename.log'
     const textFirst = 'Text with blue'
     const textSecond = 'Text with red'
     const textBoth = 'Text with blue and red'
@@ -43,9 +44,8 @@ describe('log search', async () => {
     })
 
     it('file does not exist', async (_t) => {
-        assert.rejects(async () => { 
-            await logSearch.findFile('gibberishNonexistentFilename')
-        })
+        const result = await logSearch.findFile(badFilename)
+        assert.equal(result, '')
     })
 
     // filter
@@ -122,5 +122,11 @@ describe('log search', async () => {
         assert.equal(lines.length, 2)
         assert.equal(lines[0], fishLineUpper)
         assert.equal(lines[1], fishLineLower)
+    })
+
+    it('throws error on invalid filename', async (_t) => {
+        assert.rejects(async () => {
+            await logSearch.getLogs(badFilename, 10, [], false, false)
+        })
     })
 })
