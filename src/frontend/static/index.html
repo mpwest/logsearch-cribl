@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Search</title>
+    <link rel="stylesheet" type="text/css" href="app.css">
+</head>
+<body>
+    <form action="" id="app" method="GET">
+        <div id="criteria" class="center">
+            <input type="text" id="filename">
+            <label for="filename">File</label><br>
+            <div id="searchTermList">
+                <div>Search terms</div>
+                <input type="text" class="searchTerm">
+            </div>
+            <button type="button" id="addSearchTerm" name="addSearchTerm" onclick="addSearchTerm">+</button><br>
+            <input type="number" id="recordCount" name="recordCount">
+            <label for="recordCount">Number of records</label><br>
+            <input type="checkbox" id="includeAny" name="includeAny">
+            <label for="includeAny">Include lines with any search terms</label><br>
+            <input type="checkbox" id="matchCase" name="matchCase">
+            <label for="matchCase">Match case</label><br>
+            <button type="button" id="sendRequest" name="sendRequest" onclick="sendRequest">Send Request</button>
+        </div>
+    </form>
+    <div id="results">
+    </div>
+
+    <script type="module" type="text/script" src="app.js"></script>
+</body>
+</html>

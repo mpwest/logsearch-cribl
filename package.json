@@ -4,9 +4,9 @@
   "description": "Log search API implemented for Cribl",
   "main": "src/index.ts",
   "scripts": {
-    "test": "node --env-file=.env --import tsx --test src/test/*test.ts",
-    "start": "node --env-file=.env dist/index.js",
-    "build": "tsc --build",
+    "test": "node --env-file=.envWindows --import tsx --test src/test/*test.ts",
+    "start": "node --env-file=.envWindows dist/index.js",
+    "build": "tsc --build && xcopy .\\src\\frontend\\static\\* .\\dist\\frontend\\* /y",
     "clean": "tsc --build --clean"
   },
   "repository": {

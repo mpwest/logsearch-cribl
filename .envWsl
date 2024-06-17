@@ -1,6 +1,6 @@
 Port = 8080
 BatchSize = 50000
 DefaultRecordCount = 100
-LogLevel = 0
+LogLevel = 2
 LogPath = ./SampleData
 Output = output.log
