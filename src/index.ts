@@ -1,5 +1,6 @@
 import express, { Application } from 'express'
 import path from 'path'
+import fs from 'fs'
 
 import { logRoutes }  from './routes/LogController'
 import Logger from './logger/Logger'
@@ -12,11 +13,20 @@ process.on('uncaughtException', function (err) {
 const app: Application = express()
 const port = process.env.Port || 8080
 
-app.use(express.static(path.resolve(__dirname, "frontend")))
+app.use(express.static(path.resolve(__dirname, 'frontend')))
 
-app.get("/home", (req, res) => {
+app.get('/home', (req, res) => {
   res.sendFile(path.resolve(__dirname, 'frontend', 'index.html'))
-});
+})
+
+app.get('/favicon.ico', (req, res) => {
+  res.setHeader('Content-Type', 'image/x-icon')
+  const logger = new Logger()
+  logger.debug('Send favicon')
+  const imgLocation = path.join(__dirname, 'frontend', 'favicon.ico')
+  fs.createReadStream(imgLocation).pipe(res)
+  return
+})
 
 app.use('/', logRoutes)
 
@@ -51,7 +61,7 @@ async function registerWithPrimary(logger: Logger, address: string, port?: strin
     logger.debug(`Register at ${url}`)
 
     fetch(url, {
-      method: "post"
+      method: 'post'
     })
   }
 }

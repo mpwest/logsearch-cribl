@@ -26,29 +26,4 @@ Enhancements:
  		I assume not, since logs are likely to change more often than retrieving logs
 	Improve imports: allow importing multiple types from containing folder/index file,
  		ex consolidate multiple error types into one export
-	Change structure of response to include array of results and statistics
-		ex:
-			[
-				{
-					Results:
-					[
-						"<64>1 2024-06-18T10:28:17.453204Z rumble9801 lagoonFrame.txt 45786 CarpoolFracturePivot ..."
-						...
-					],
-					Stats:
-					{
-						Source: "PrimaryServerName",
-						Count: 138
-					}
-				},
-				{
-					Results:
-					[],
-					Stats:
-					{
-						Source: "SecondaryServer1Name",
-						Count: 0
-					}
-				},
-				...
-			]
+
