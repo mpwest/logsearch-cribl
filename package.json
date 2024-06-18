@@ -4,7 +4,7 @@
   "description": "Log search API implemented for Cribl",
   "main": "src/index.ts",
   "scripts": {
-    "test": "node --env-file=.envWindows --import tsx --test src/test/*test.ts",
+    "test": "node --env-file=.envWindows --test dist/test/*test.js",
     "start": "node --env-file=.env dist/index.js",
     "build": "tsc --build && xcopy .\\src\\frontend\\static\\* .\\dist\\frontend\\* /y",
     "clean": "tsc --build --clean",
@@ -17,8 +17,7 @@
   },
   "author": "Mark West",
   "dependencies": {
-    "express": "^4.19.2",
-    "tsx": "^4.15.6"
+    "express": "^4.19.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.21"
