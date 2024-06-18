@@ -1,5 +1,6 @@
 Port = 8080
 BatchSize = 50000
 DefaultRecordCount = 100
-LogLevel = 1
+LogLevel = 2
 LogPath = ./SampleData
+ServerName = WindowsPrimary

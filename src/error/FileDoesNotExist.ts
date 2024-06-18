@@ -4,4 +4,4 @@ class FileDoesNotExist extends Error {
     }
 }
 
-export = FileDoesNotExist
+export default FileDoesNotExist

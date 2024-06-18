@@ -111,17 +111,17 @@ describe('log search', async () => {
     })
 
     it('searches file for logs', async (_t) => {
-        const lines = await logSearch.getLogs(filename, 1, [], false, false)
-        assert.equal(lines.length, 1)
-        assert.equal(lines[0].trim(), lastLine)
+        const response = await logSearch.getLogs(filename, 1, [], false, false)
+        assert.equal(response.Results.length, 1)
+        assert.equal(response.Results[0].trim(), lastLine)
     })
 
     // tests on filter() should handle complexities with filter
     it('searches file for logs with simple filter', async (_t) => {
-        const lines = await logSearch.getLogs(filename, 10, ['fish'], false, false)
-        assert.equal(lines.length, 2)
-        assert.equal(lines[0], fishLineUpper)
-        assert.equal(lines[1], fishLineLower)
+        const response = await logSearch.getLogs(filename, 10, ['fish'], false, false)
+        assert.equal(response.Results.length, 2)
+        assert.equal(response.Results[0], fishLineUpper)
+        assert.equal(response.Results[1], fishLineLower)
     })
 
     it('throws error on invalid filename', async (_t) => {

@@ -80,18 +80,26 @@ function sendRequest() {
       })
 }
 
-function display(data: string[]) {
+function display(data: LogStats[]) {
     let container = document.getElementById('results')
     if (container) {
         container.innerHTML = ''
-        let bg = true
-        for(const line in data) {
-            const element = document.createElement('div')
-            element.className = bg ? 'oddLine' : 'evenLine'
-            const text = document.createTextNode(data[line])
-            element.appendChild(text)
-            container.appendChild(element)
-            bg = !bg
+        for(const i in data) {
+            const sectionTitle = document.createElement('div')
+            sectionTitle.className = 'serverName'
+            const sectionText = document.createTextNode(`${data[i].Source}: ${data[i].Count} records`)
+            sectionTitle.appendChild(sectionText)
+            container.appendChild(sectionTitle)
+
+            let bg = true
+            for(const line in data[i].Results) {
+                const element = document.createElement('div')
+                element.className = bg ? 'oddLine' : 'evenLine'
+                const text = document.createTextNode(data[i].Results[line])
+                element.appendChild(text)
+                container.appendChild(element)
+                bg = !bg
+            }
         }
     }
 }
@@ -115,3 +123,9 @@ var tid = setInterval( function () {
     clearInterval(tid)
     setListeners()
 }, 100 )
+
+interface LogStats {
+    Source: string
+    Count: number
+    Results: string[]
+}

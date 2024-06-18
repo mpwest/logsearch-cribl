@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import Logger from '../logger/Logger'
 import FileDoesNotExist from '../error/FileDoesNotExist'
+import LogStats from './LogStats'
 
 class LogSearch {
     logger: Logger
@@ -26,7 +27,7 @@ class LogSearch {
         }
     }
 
-    async getLogs (filename: string, recordCount: number, searchTerms: string[], searchAny: boolean, matchCase: boolean): Promise<string[]> {
+    async getLogs (filename: string, recordCount: number, searchTerms: string[], searchAny: boolean, matchCase: boolean): Promise<LogStats> {
         this.logger.trace('getLogs')
         let fileHandle
         try {
@@ -87,7 +88,11 @@ class LogSearch {
                     readStart -= batchSize
                 }
             }
-            return entries
+            return {
+                Source: process.env.ServerName || 'Unknown Server',
+                Count: entries.length,
+                Results: entries
+            }
         }
         finally
         {
@@ -141,4 +146,4 @@ class LogSearch {
     }
 }
 
-export = LogSearch
+export default LogSearch

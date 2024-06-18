@@ -4,3 +4,4 @@ DefaultRecordCount = 100
 LogLevel = 2
 LogPath = ./SampleData2
 PrimaryAddress = http://localhost:8080
+ServerName = WindowsSecondary

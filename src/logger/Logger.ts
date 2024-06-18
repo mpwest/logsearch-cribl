@@ -74,4 +74,4 @@ enum LogLevel {
     trace = 0
 }
 
-export = Logger
+export default Logger

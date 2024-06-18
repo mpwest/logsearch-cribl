@@ -4,4 +4,5 @@ DefaultRecordCount = 100
 LogLevel = 2
 LogPath = ./SampleData
 Output = output.log
+ServerName = WSLSecondary
 PrimaryAddress = http://localhost:8084

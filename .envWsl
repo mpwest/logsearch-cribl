@@ -4,3 +4,4 @@ DefaultRecordCount = 100
 LogLevel = 2
 LogPath = ./SampleData
 Output = output.log
+ServerName = WSLPrimary

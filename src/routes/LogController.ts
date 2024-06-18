@@ -2,6 +2,7 @@ import LogSearch from '../logs/LogSearch'
 import express from 'express'
 import FileDoesNotExist from '../error/FileDoesNotExist'
 import Logger from '../logger/Logger'
+import LogStats from '../logs/LogStats'
 
 export var logRoutes = express.Router()
 
@@ -50,10 +51,10 @@ logRoutes.get('/logs/:filename', async function(req: express.Request, res: expre
         // handling if keywords is ParsedQ
         searchTerms.push(keywords.toString())
     }
-    let response: string[] = []
+    let response: LogStats[] = []
     logger.info(`log request for ${filename} (${recordCount} records${searchTerms.length > 0 ? `, search terms: ${searchTerms}${searchAny ? ' (Any)' : ' (All)'}`: ''})`)
     try {
-        response = await new LogSearch(logger).getLogs(filename!, recordCount, searchTerms, searchAny, matchCase)
+        response.push(await new LogSearch(logger).getLogs(filename!, recordCount, searchTerms, searchAny, matchCase))
     }
     catch (err: unknown){
         if (err instanceof FileDoesNotExist) {
@@ -70,7 +71,10 @@ logRoutes.get('/logs/:filename', async function(req: express.Request, res: expre
         for(const i in secondaryPromises) {
             const secondaryResult = await secondaryPromises[i]
             logger.trace(`Secondary server ${i} results: ${secondaryResult.length}`)
-            response = response.concat(secondaryResult)
+            for(const j in secondaryResult) {
+                // Likely just 1, but possible to be chained together
+                response.push(secondaryResult[j])
+            }
         }
 
         res.send(response)
