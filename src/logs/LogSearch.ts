@@ -63,7 +63,13 @@ class LogSearch {
                 for(let i = lines.length - 1; i >=0; i--) {
                     // May wish to filter out whitespace, but seems not worth the processing, given the record source rarely includes non-empty whitespace lines
                     if(entries.length < recordCount && lines[i].length > 0 && this.filter(lines[i], searchTerms, searchAny, matchCase)) {
-                        this.logger.debug(`Found line: ${lines[i]}`)
+                        if (entries.length < 2) {
+                            this.logger.debug(`Found line: ${lines[i]}`)
+                        } else if (entries.length == 2) {
+                            this.logger.debug('Additional output not shown') || this.logger.trace(`Found line: ${lines[i]}`)
+                        } else {
+                            this.logger.trace(`Found line: ${lines[i]}`)
+                        }
                         entries.push(lines[i])
                     }
                 }

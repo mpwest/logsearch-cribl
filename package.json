@@ -5,9 +5,11 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "node --env-file=.envWindows --import tsx --test src/test/*test.ts",
-    "start": "node --env-file=.envWindows dist/index.js",
+    "start": "node --env-file=.env dist/index.js",
     "build": "tsc --build && xcopy .\\src\\frontend\\static\\* .\\dist\\frontend\\* /y",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "windows": "start \"logSearch\" /b node --env-file=.envWindows dist/index.js & start \"logSearch\" /b node --env-file=.env2 dist/index.js",
+    "unix": "command & node --env-file=.env dist/index.js & node --env-file=.env2 dist/index.js"
   },
   "repository": {
     "type": "git",

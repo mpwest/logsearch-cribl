@@ -1,0 +1,6 @@
+Port = 8081
+BatchSize = 50000
+DefaultRecordCount = 100
+LogLevel = 2
+LogPath = ./SampleData2
+PrimaryAddress = http://localhost:8080
