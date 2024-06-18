@@ -73,10 +73,6 @@ logRoutes.get('/logs/:filename', async function(req: express.Request, res: expre
             response = response.concat(secondaryResult)
         }
 
-        if (response.length == 0) {
-            res.status(400).send('No matching files found')
-        }
-
         res.send(response)
     }
 })

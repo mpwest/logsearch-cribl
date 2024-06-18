@@ -14,4 +14,4 @@ LogSearch.zip
 dist/
 
 package-lock.json
-output.log
+out*.log

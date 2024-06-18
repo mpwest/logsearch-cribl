@@ -1,6 +1,7 @@
-Port = 8084
+Port = 8085
 BatchSize = 50000
 DefaultRecordCount = 100
 LogLevel = 2
 LogPath = ./SampleData
 Output = output.log
+PrimaryAddress = http://localhost:8084
