@@ -17,6 +17,11 @@ logRoutes.get('/logs/:filename', async function(req: express.Request, res: expre
         logger.trace(`fetch from ${secondaryServers[i]}`)
         const fetchRequest = fetch(new URL(`${secondaryServers[i]}${req.url}`))
         .then((responseBody) => responseBody.json())
+        .catch((_err)=> { return [{
+            Source: `Unavailable server at ${secondaryServers[i]}`,
+            Count: 0,
+            Results: []
+        }]})
 
         const timeout = new Promise(function(resolve, reject) {
             setTimeout(function() {
@@ -92,6 +97,10 @@ logRoutes.post('/register/:url', async function(req: express.Request, res: expre
     let { url } = req.params
     url = decodeURIComponent(url)
     logger.trace(`Register secondary server at ${url}`)
+    if(secondaryServers.includes(url)){
+        res.send('')
+        return
+    }
     const fetchRequest: Promise<boolean> = fetch(new URL(`${url}/confirm`))
         .then(async (result) => result.ok)
         .catch((err) => {

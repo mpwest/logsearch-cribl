@@ -21,9 +21,10 @@ Instructions
 Enhancements:
 
 	Add security
-	Improve input checks, and error handling
+	Improve input checks, and error handling; remove failing secondary servers
 	Determine usage level, and implement caching if warranted?
  		I assume not, since logs are likely to change more often than retrieving logs
 	Improve imports: allow importing multiple types from containing folder/index file,
  		ex consolidate multiple error types into one export
+	Break functions into smaller pieces
 
