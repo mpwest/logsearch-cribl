@@ -67,7 +67,8 @@ logRoutes.get('/logs/:filename', async function(req: express.Request, res: expre
             response = []
         } else {
             // other error handling here as needed
-            res.status(500).send()
+            logger.error((err as Error).message)
+            res.status(500)
         }
     }
     finally {

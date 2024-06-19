@@ -27,6 +27,21 @@ class LogSearch {
         }
     }
 
+    // I need to work on other tasks now, so here are ideas for correcting the issue where many lines are stored in memory, then sent to the client all at once.
+
+    // Idea 1: Pagination.
+    //      Reduce maximum allowed recordCount in request, using max allowed value when requested count is higher.
+    //      Include data on current readStart, and number of records already found in current block in response (without displaying to user).
+    //      Modify client to send this data in subsequent requests (ideally infinite scroll, otherwise 'load more' button), to avoid reprocessing
+    //      Since readStart is calculated from start of file, writing more data to the end of a log won't cause duplicated or missed lines between pages
+    //      When receiving request that includes pagination data, start reading from readStart provided by client, skip n records, and continue with current logic
+    //      Pagination data must be differentiated by server
+
+    // Idea 2: Streaming
+    //      Change getLogs to generator function, yielding n records and using res.write to return data.
+    //      Response data must change to indicate source with each log line
+    //      Add critical section and lock to avoid interleaving data from multiple servers
+
     async getLogs (filename: string, recordCount: number, searchTerms: string[], searchAny: boolean, matchCase: boolean): Promise<LogStats> {
         this.logger.trace('getLogs')
         let fileHandle
@@ -57,10 +72,11 @@ class LogSearch {
                 blockStart = lines[0]
                 this.logger.trace(`blockStart: ${blockStart}`)
 
-                // ignore first line, assuming it's a partial line, unless line spans multiple chunks, or beginning of file reached
-                if (readStart > 0 && lines.length > 1) {
+                // ignore partial lines
+                if (readStart > 0 && !batch.startsWith('\r') && !batch.startsWith('\n')) {
                     lines.shift()
                 }
+                // Build up lines over multiple batches if line length is larger than batch size.
                 for(let i = lines.length - 1; i >=0; i--) {
                     // May wish to filter out whitespace, but seems not worth the processing, given the record source rarely includes non-empty whitespace lines
                     if(entries.length < recordCount && lines[i].length > 0 && this.filter(lines[i], searchTerms, searchAny, matchCase)) {
@@ -102,6 +118,8 @@ class LogSearch {
         }
     }
 
+    // File traversal implicitly prevented here, by checking if only files in allowed folder match name provided
+    // Rather than allowing file traversal to child folders, perhaps instead comma separate multiple folders in config, and check each location.
     async findFile(filename: string): Promise<string> {
         const folder = this.getPath()
         this.logger.trace(folder)
